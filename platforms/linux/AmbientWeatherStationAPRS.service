@@ -1,0 +1,15 @@
+[Unit]
+Description=Ambient Weather Station APRS Reporter
+
+[Service]
+User=
+WorkingDirectory=
+Type=simple
+Restart=always
+SuccessExitStatus=143
+RemainAfterExit=yes
+ExecStart=java -jar ambientweatheragent-1.0.jar
+
+[Install]
+WantedBy=multi-user.target
+

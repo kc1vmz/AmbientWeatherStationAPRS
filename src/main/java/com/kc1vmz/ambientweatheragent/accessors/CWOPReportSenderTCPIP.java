@@ -3,6 +3,7 @@ package com.kc1vmz.ambientweatheragent.accessors;
 import java.net.URI;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.time.LocalDateTime;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -46,7 +47,7 @@ public class CWOPReportSenderTCPIP {
 
             HttpResponse<?> response = client.send(request,  BodyHandlers.ofString());
             String responseBody = response.body().toString();
-            System.out.println("Response body: " + responseBody);
+            System.out.println(String.format("%s : %s", LocalDateTime.now().toString(), responseBody));
         } catch (Exception e) {
             e.printStackTrace();
         }
