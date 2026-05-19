@@ -1,6 +1,8 @@
 package com.kc1vmz.ambientweatheragent.accessors;
 
 import java.time.ZonedDateTime;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.kc1vmz.ambientweatheragent.objects.AmbientWeatherStationProperties;
 import com.kc1vmz.ambientweatheragent.objects.CWOPReport;
@@ -12,13 +14,18 @@ import jakarta.inject.Singleton;
 public class AmbientWeatherStationReportProcessor {
     @Inject
     private CWOPReportSenderTCPIP cwopReportSenderTCPIP;
+    private static final Logger logger = LogManager.getLogger(AmbientWeatherStationReportProcessor.class);
 
     /**
      * Process a report by sending it to CWOP via cwop.rest
      * @param report Weather report to send to CWOP
      */
     public void processReport(AmbientWeatherStationProperties report) {
-        cwopReportSenderTCPIP.sendToCWOP(createCWOPReport(report));
+        try {
+            cwopReportSenderTCPIP.sendToCWOP(createCWOPReport(report));
+        } catch (Exception e) {
+           logger.error("Exception caught", e);
+        }
     }
 
     /**
