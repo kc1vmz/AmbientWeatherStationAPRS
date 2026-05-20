@@ -13,7 +13,7 @@ Environment=AW_CALLSIGN=xxxxxx
 Environment=AW_LAT=xxxxxx
 Environment=AW_LON=xxxxxx
 
-ExecStart=java -jar ambientweatheragent-1.1.jar
+ExecStart=java -jar ambientweatheragent-1.2.jar
 
 [Install]
 WantedBy=multi-user.target

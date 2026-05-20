@@ -1,5 +1,9 @@
 package com.kc1vmz.ambientweatheragent.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kc1vmz.ambientweatheragent.accessors.AmbientWeatherStationReportProcessor;
 import com.kc1vmz.ambientweatheragent.objects.AmbientWeatherStationProperties;
 
@@ -20,11 +24,26 @@ public class AmbientWeatherStationListener {
 
     @Inject
     private AmbientWeatherStationReportProcessor ambientWeatherStationReportProcessor;
+    private static final Logger logger = LogManager.getLogger(AmbientWeatherStationListener.class);
 
     // https://ambientweather.com/faqs/question/view/id/1857/
     @Get(uri="/{?report*}")
-    public String receivedReport(@Valid AmbientWeatherStationProperties report) { 
-        ambientWeatherStationReportProcessor.processReport(report);
+    public String receivedReport(@Valid String report) { 
+
+        logger.info("Report received from weather station");
+        String ret = processReportString(report);
+        logger.info("Report processed");
+        return ret;
+    }
+
+    private String processReportString(String val) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            AmbientWeatherStationProperties report = mapper.readValue(val, AmbientWeatherStationProperties.class);
+            ambientWeatherStationReportProcessor.processReport(report);
+        } catch (Exception e) {
+            logger.error(String.format("Exception caught processing weather report: '%s'", val), e);
+        }
         return "OK";  // weather device does not care
     }
 }
