@@ -1,16 +1,19 @@
 package com.kc1vmz.ambientweatheragent.controller;
 
+import java.util.Map;
+import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kc1vmz.ambientweatheragent.accessors.AmbientWeatherStationReportProcessor;
 import com.kc1vmz.ambientweatheragent.objects.AmbientWeatherStationProperties;
 
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
 import jakarta.inject.Inject;
-import jakarta.validation.Valid;
 
 /*
  * Ambient Weather Station customization is configured to send AmbientWeather format data to this endpoint.
@@ -27,22 +30,76 @@ public class AmbientWeatherStationListener {
     private static final Logger logger = LogManager.getLogger(AmbientWeatherStationListener.class);
 
     // https://ambientweather.com/faqs/question/view/id/1857/
-    @Get(uri="/{?report*}")
-    public String receivedReport(@Valid String report) { 
-
+    @Get("/{?values*}")
+    public String dynamicSearch(@Nullable @QueryValue("values") Map<String, String> values) {
         logger.info("Report received from weather station");
-        String ret = processReportString(report);
+        String ret = processReportString(values);
         logger.info("Report processed");
         return ret;
     }
 
-    private String processReportString(String val) {
-        ObjectMapper mapper = new ObjectMapper();
+    private String processReportString(Map<String, String> values) {
+        if (values == null) {
+            return "OK";
+        }
         try {
-            AmbientWeatherStationProperties report = mapper.readValue(val, AmbientWeatherStationProperties.class);
+            AmbientWeatherStationProperties report = new AmbientWeatherStationProperties();
+            if (values.containsKey("dailyrainin")) {
+                report.setDailyrainin(Optional.of(Double.parseDouble(values.get("dailyrainin"))));
+            } else {
+                report.setDailyrainin(Optional.of(0.0));
+            }
+            if (values.containsKey("humidity")) {
+                report.setHumidity(Optional.of(Integer.parseInt(values.get("humidity"))));
+            } else {
+                report.setHumidity(Optional.of(0));
+            }
+            if (values.containsKey("x24hourrainin")) {
+                report.setX24hourrainin(Optional.of(Double.parseDouble(values.get("x24hourrainin"))));
+            } else {
+                report.setX24hourrainin(Optional.of(0.0));
+            }
+            if (values.containsKey("baromrelin")) {
+                report.setBaromrelin(Optional.of(Double.parseDouble(values.get("baromrelin"))));
+            } else {
+                report.setBaromrelin(Optional.of(0.0));
+            }
+            if (values.containsKey("hourlyrainin")) {
+                report.setHourlyrainin(Optional.of(Double.parseDouble(values.get("hourlyrainin"))));
+            } else {
+                report.setHourlyrainin(Optional.of(0.0));
+            }
+            if (values.containsKey("solarradiation")) {
+                report.setSolarradiation(Optional.of(Double.parseDouble(values.get("solarradiation"))));
+            } else {
+                report.setSolarradiation(Optional.of(0.0));
+            }
+            if (values.containsKey("tempf")) {
+                report.setTempf(Optional.of(Double.parseDouble(values.get("tempf"))));
+            } else {
+                report.setTempf(Optional.of(0.0));
+            }
+            if (values.containsKey("winddir")) {
+                report.setWinddir(Optional.of(Integer.parseInt(values.get("winddir"))));
+            } else {
+                report.setWinddir(Optional.of(0));
+            }
+            if (values.containsKey("windgustmph")) {
+                report.setWindgustmph(Optional.of(Double.parseDouble(values.get("windgustmph"))));
+            } else {
+                report.setWindgustmph(Optional.of(0.0));
+            }
+            if (values.containsKey("windspeedmph")) {
+                report.setWindspeedmph(Optional.of(Double.parseDouble(values.get("windspeedmph"))));
+            } else {
+                report.setWindspeedmph(Optional.of(0.0));
+            }
+            if (values.containsKey("dateutc")) {
+                report.setDateutc(Optional.of(values.get("dateutc")));
+            }
             ambientWeatherStationReportProcessor.processReport(report);
         } catch (Exception e) {
-            logger.error(String.format("Exception caught processing weather report: '%s'", val), e);
+            logger.error("Exception caught processing weather report", e);
         }
         return "OK";  // weather device does not care
     }

@@ -45,7 +45,7 @@ public class AmbientWeatherStationReportProcessor {
         if (report.getX24hourrainin().isPresent()) {
             cwopReport.setLast24hrrainin(report.getX24hourrainin().get());
         }
-        if (report.getBaromabsin().isPresent()) {
+        if (report.getBaromrelin().isPresent()) {
             cwopReport.setPressure(convertPressure(report.getBaromrelin().get()));
         }
         if (report.getHourlyrainin().isPresent()) {
