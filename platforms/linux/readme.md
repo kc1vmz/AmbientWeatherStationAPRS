@@ -24,8 +24,8 @@ To run this program from a terminal, do the following:
     AW_LON
     AW_HTTP_PORT (default is 8888)
 
-2) Make sure the permissions on the ambientweatheragent-1.3.jar file are set for execution
+2) Make sure the permissions on the ambientweatheragent-1.4.jar file are set for execution
 
 3) Run the following command:
-    java -jar ambientweatheragent-1.3.jar
+    java -jar ambientweatheragent-1.4.jar
 

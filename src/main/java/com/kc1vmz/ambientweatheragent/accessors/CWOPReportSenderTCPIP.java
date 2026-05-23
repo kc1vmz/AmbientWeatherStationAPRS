@@ -1,5 +1,7 @@
 package com.kc1vmz.ambientweatheragent.accessors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.net.URI;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
@@ -21,6 +23,7 @@ import com.kc1vmz.ambientweatheragent.objects.CWOPReport;
 public class CWOPReportSenderTCPIP {
     @Inject
     private ApplicationConfiguration applicationConfiguration;
+    private static final Logger logger = LogManager.getLogger(CWOPReportSenderTCPIP.class);
 
     /**
      * Send a CWOP weather report to cwop.rest service
@@ -47,7 +50,7 @@ public class CWOPReportSenderTCPIP {
 
             HttpResponse<?> response = client.send(request,  BodyHandlers.ofString());
             String responseBody = response.body().toString();
-            System.out.println(String.format("%s : %s", LocalDateTime.now().toString(), responseBody));
+            logger.info(String.format("%s : %s", LocalDateTime.now().toString(), responseBody));
         } catch (Exception e) {
             e.printStackTrace();
         }
