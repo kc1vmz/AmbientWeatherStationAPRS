@@ -1,11 +1,31 @@
 package com.kc1vmz.ambientweatheragent.accessors;
 
+/*
+    Copyright (c) 2026 John Rokicki KC1VMZ
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    
+    http://www.kc1vmz.com
+*/
+
 import java.time.ZonedDateTime;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kc1vmz.ambientweatheragent.objects.AmbientWeatherStationProperties;
 import com.kc1vmz.ambientweatheragent.objects.CWOPReport;
+import com.kc1vmz.ambientweatheragent.queue.CWOPReportQueue;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -13,7 +33,7 @@ import jakarta.inject.Singleton;
 @Singleton
 public class AmbientWeatherStationReportProcessor {
     @Inject
-    private CWOPReportSenderTCPIP cwopReportSenderTCPIP;
+    private CWOPReportQueue cwopReportQueue;
     private static final Logger logger = LogManager.getLogger(AmbientWeatherStationReportProcessor.class);
 
     /**
@@ -22,7 +42,7 @@ public class AmbientWeatherStationReportProcessor {
      */
     public void processReport(AmbientWeatherStationProperties report) {
         try {
-            cwopReportSenderTCPIP.sendToCWOP(createCWOPReport(report));
+            cwopReportQueue.addCWOPReport(createCWOPReport(report));
         } catch (Exception e) {
            logger.error("Exception caught", e);
         }
