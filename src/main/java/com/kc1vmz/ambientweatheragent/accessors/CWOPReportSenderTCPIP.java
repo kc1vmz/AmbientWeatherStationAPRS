@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 import java.net.URI;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.time.LocalDateTime;
+import java.time.Duration;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -57,21 +57,24 @@ public class CWOPReportSenderTCPIP {
         // send it to https://send.cwop.rest
         String uri = "https://send.cwop.rest";
         try {
+            Duration duration = Duration.ofMinutes(2);
             ObjectMapper objectMapper = getObjectMapper();
             ObjectWriter ow = objectMapper.writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(report);
+            logger.info(String.format("CWOP REST Request: %s", json));
 
             HttpClient client = HttpClient.newBuilder().build();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(uri))
                     .POST(BodyPublishers.ofString(json))
+                    .timeout(duration)
                     .build();
 
             HttpResponse<?> response = client.send(request,  BodyHandlers.ofString());
             String responseBody = response.body().toString();
-            logger.info(String.format("%s : %s", LocalDateTime.now().toString(), responseBody));
+            logger.info(String.format("CWOP REST Response: %s", responseBody));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception caught sending request to CWOP", e);
         }
         
     }

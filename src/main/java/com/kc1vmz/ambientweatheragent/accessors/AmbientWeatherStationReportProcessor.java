@@ -44,7 +44,7 @@ public class AmbientWeatherStationReportProcessor {
         try {
             cwopReportQueue.addCWOPReport(createCWOPReport(report));
         } catch (Exception e) {
-           logger.error("Exception caught", e);
+           logger.error("Exception caught processing report", e);
         }
     }
 
