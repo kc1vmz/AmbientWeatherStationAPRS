@@ -24,15 +24,15 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.kc1vmz.ambientweatheragent.accessors.AmbientWeatherStationReportProcessor;
 import com.kc1vmz.ambientweatheragent.objects.AmbientWeatherStationProperties;
+import com.kc1vmz.ambientweatheragent.queue.CWOPReportQueueReader;
 
-import io.micronaut.core.annotation.Nullable;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.QueryValue;
-import jakarta.inject.Inject;
 
 /*
  * Ambient Weather Station customization is configured to send AmbientWeather format data to this endpoint.
@@ -41,20 +41,32 @@ import jakarta.inject.Inject;
  * If you change the "fix=1" then the variable "fix" needs to be altered in the AmbientWeatherStationProperties object definition.
  */
 
-@Controller("/report") 
+@RestController
 public class AmbientWeatherStationListener {
 
-    @Inject
+    @Autowired 
     private AmbientWeatherStationReportProcessor ambientWeatherStationReportProcessor;
+    @Autowired
+    private CWOPReportQueueReader cwopReportQueueReader;
     private static final Logger logger = LogManager.getLogger(AmbientWeatherStationListener.class);
+    private boolean threadStarted = false;
 
     // https://ambientweather.com/faqs/question/view/id/1857/
-    @Get("/{?values*}")
-    public String dynamicSearch(@Nullable @QueryValue("values") Map<String, String> values) {
-        logger.info("Report received from weather station");
+    @GetMapping("/report")  // "/{?values*}"
+    public String dynamicSearch(@RequestParam Map<String, String> values) {
+        logger.debug("Report received from weather station");
+        startQueueThread();
         String ret = processReportString(values);
-        logger.info("Report processed");
+        logger.debug("Report processed");
         return ret;
+    }
+
+    private synchronized void startQueueThread() {
+        if (threadStarted) {
+            return;
+        }
+        cwopReportQueueReader.readerThread();
+        threadStarted = true;
     }
 
     private String processReportString(Map<String, String> values) {

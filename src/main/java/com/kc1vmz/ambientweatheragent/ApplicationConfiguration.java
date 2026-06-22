@@ -1,5 +1,8 @@
 package com.kc1vmz.ambientweatheragent;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 /*
     Copyright (c) 2026 John Rokicki KC1VMZ
 
@@ -19,10 +22,8 @@ package com.kc1vmz.ambientweatheragent;
     http://www.kc1vmz.com
 */
 
-import io.micronaut.context.annotation.Value;
-import jakarta.inject.Singleton;
 
-@Singleton
+@Service
 public class ApplicationConfiguration {
     @Value("${app.callsign}")
     private String callsign;

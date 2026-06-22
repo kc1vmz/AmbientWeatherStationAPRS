@@ -23,12 +23,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import com.kc1vmz.ambientweatheragent.objects.CWOPReport;
 
-import jakarta.inject.Singleton;
-
-@Singleton
+@Service
 public class CWOPReportQueue {
 
     private static final Logger logger = LogManager.getLogger(CWOPReportQueue.class);

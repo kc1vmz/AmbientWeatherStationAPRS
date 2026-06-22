@@ -23,15 +23,10 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.micronaut.core.annotation.Introspected;
-import io.micronaut.serde.annotation.Serdeable.Deserializable;
-
 /*
  * Only values needed by CWOP are properly cast to their correct data types.
  * The rest are read as strings.
  */
-@Introspected
-@Deserializable
 public class AmbientWeatherStationProperties {
     @JsonProperty("fix")
     private Optional<String> fix;

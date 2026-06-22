@@ -21,6 +21,15 @@ package com.kc1vmz.ambientweatheragent.accessors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.kc1vmz.ambientweatheragent.ApplicationConfiguration;
+import com.kc1vmz.ambientweatheragent.objects.CWOPReport;
+
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+
 import java.net.URI;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
@@ -28,19 +37,11 @@ import java.time.Duration;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.kc1vmz.ambientweatheragent.ApplicationConfiguration;
-import com.kc1vmz.ambientweatheragent.objects.CWOPReport;
 
-@Singleton
+
+@Service
 public class CWOPReportSenderTCPIP {
-    @Inject
+    @Autowired 
     private ApplicationConfiguration applicationConfiguration;
     private static final Logger logger = LogManager.getLogger(CWOPReportSenderTCPIP.class);
 
@@ -58,10 +59,10 @@ public class CWOPReportSenderTCPIP {
         String uri = "https://send.cwop.rest";
         try {
             Duration duration = Duration.ofMinutes(2);
-            ObjectMapper objectMapper = getObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper();
             ObjectWriter ow = objectMapper.writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(report);
-            logger.info(String.format("CWOP REST Request: %s", json));
+            logger.debug(String.format("CWOP REST Request: %s", json));
 
             HttpClient client = HttpClient.newBuilder().build();
             HttpRequest request = HttpRequest.newBuilder()
@@ -72,25 +73,11 @@ public class CWOPReportSenderTCPIP {
 
             HttpResponse<?> response = client.send(request,  BodyHandlers.ofString());
             String responseBody = response.body().toString();
-            logger.info(String.format("CWOP REST Response: %s", responseBody));
+            logger.debug(String.format("CWOP REST Response: %s", responseBody));
         } catch (Exception e) {
             logger.error("Exception caught sending request to CWOP", e);
         }
         
-    }
-
-    /**
-     * initialize the object mapper with common extensions
-     *
-     * @return
-     */
-    private ObjectMapper getObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new Jdk8Module());
-
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        return objectMapper;
     }
 }
 

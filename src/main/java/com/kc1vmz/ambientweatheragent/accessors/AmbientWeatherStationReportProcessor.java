@@ -22,17 +22,17 @@ package com.kc1vmz.ambientweatheragent.accessors;
 import java.time.ZonedDateTime;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.kc1vmz.ambientweatheragent.objects.AmbientWeatherStationProperties;
 import com.kc1vmz.ambientweatheragent.objects.CWOPReport;
 import com.kc1vmz.ambientweatheragent.queue.CWOPReportQueue;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
-@Singleton
+@Service
 public class AmbientWeatherStationReportProcessor {
-    @Inject
+    @Autowired 
     private CWOPReportQueue cwopReportQueue;
     private static final Logger logger = LogManager.getLogger(AmbientWeatherStationReportProcessor.class);
 
